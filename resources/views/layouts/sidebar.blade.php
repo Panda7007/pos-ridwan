@@ -36,7 +36,7 @@
             </li>
             <li>
                 <a href="{{ route('member.index') }}">
-                    <i class="fa fa-id-card"></i> <span>Member</span>
+                    <i class="fa fa-id-card"></i> <span>Reseller</span>
                 </a>
             </li>
             <li>

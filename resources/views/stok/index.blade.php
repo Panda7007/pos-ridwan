@@ -16,13 +16,13 @@ Manajemen Stok
             <div class="box-header with-border">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create">
-                        Launch Default Modal
+                        Input Material
                     </button>
                     <div class="modal fade" id="create" style="display: none;" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h4 class="modal-title">Default Modal</h4>
+                                    <h4 class="modal-title">Input Material</h4>
                                 </div>
                                 <div class="modal-body">
                                     <div class="form-group">

@@ -14,6 +14,7 @@ use App\Http\Controllers\{
     SettingController,
     SupplierController,
     UserController,
+    StokController
 };
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +70,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/penjualan/{id}', [PenjualanController::class, 'show'])->name('penjualan.show');
         Route::post('/penjualan', [PenjualanController::class, 'update'])->name('penjualan.update');
         Route::delete('/penjualan/{id}', [PenjualanController::class, 'destroy'])->name('penjualan.destroy');
+
+        Route::resource("stok", StokController::class);
     });
 
     Route::group(['middleware' => 'level:1,2'], function () {

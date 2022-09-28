@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Stok;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Produk extends Model
 {
     use HasFactory;
 
     protected $table = 'produk';
-    protected $primaryKey = 'id_produk';
-    protected $guarded = [];
+    protected $guarded = ["id"];
+    protected $with = ["stok"];
+
+    public function stok()
+    {
+        return $this->belongsToMany(Stok::class)->withPivot("jumlah");
+    }
 }

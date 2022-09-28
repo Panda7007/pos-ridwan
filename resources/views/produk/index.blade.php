@@ -23,7 +23,7 @@
             <div class="box-body table-responsive">
                 <form action="" method="post" class="form-produk">
                     @csrf
-                    <table class="table table-striped table-bordered">
+                    <table class="data table table-striped table-bordered">
                         <thead>
                             <th width="5%">
                                 <input type="checkbox" name="select_all" id="select_all">
@@ -53,8 +53,12 @@
 <script>
     let table;
 
+    (function () {
+        $("select").select2();
+    })();
+
     $(function () {
-        table = $('.table').DataTable({
+        table = $('.data.table').DataTable({
             responsive: true,
             processing: true,
             serverSide: true,
@@ -178,6 +182,40 @@
                 .attr('action', url)
                 .submit();
         }
+    }
+
+    let material = {!!$material!!};
+
+    function getMax(element) {
+        element.parentElement.nextElementSibling.children[0].setAttribute("max", material.find(materi => materi.id == element.value).sisa);
+    }
+
+    function tambahRow(element) {
+        let select = document.createElement("select");
+        let option = undefined;
+        material.forEach(materi => {
+            option = document.createElement("option");
+            option.value = materi.id;
+            option.text = materi.nama_barang;
+            select.appendChild(option);
+        });
+        $(element).parent().parent().parent().append(`
+                            <tr>
+                                <td>
+                                    <select onchange="getMax(this)" name="material[]" style="width:100%" class="form-control">
+                                        <option value="">Pilih Material</option>
+                                        ${select.innerHTML}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" min="1" name="jumlah[]" class="form-control">
+                                </td>
+                                <td>
+                                    <button type="button" onclick="tambahRow(this)" class="btn btn-success">Tambah Bahan</button>
+                                </td>
+                            </tr>
+        `);
+        $("select").select2()
     }
 </script>
 @endpush

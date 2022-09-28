@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use PDF;
+use App\Models\Stok;
+use App\Models\Produk;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
-use App\Models\Produk;
-use PDF;
+use App\Http\Controllers\Controller;
 
 class ProdukController extends Controller
 {
@@ -18,7 +20,9 @@ class ProdukController extends Controller
     {
         $kategori = Kategori::all()->pluck('nama_kategori', 'id_kategori');
 
-        return view('produk.index', compact('kategori'));
+        return view('produk.index', [
+            "material" => Stok::get()
+        ], compact('kategori'));
     }
 
     public function data()
@@ -33,7 +37,7 @@ class ProdukController extends Controller
             ->addIndexColumn()
             ->addColumn('select_all', function ($produk) {
                 return '
-                    <input type="checkbox" name="id_produk[]" value="'. $produk->id_produk .'">
+                    <input type="checkbox" name="id_produk[]" value="'. $produk->id .'">
                 ';
             })
             ->addColumn('kode_produk', function ($produk) {
@@ -54,8 +58,8 @@ class ProdukController extends Controller
             ->addColumn('aksi', function ($produk) {
                 return '
                 <div class="btn-group">
-                    <button type="button" onclick="editForm(`'. route('produk.update', $produk->id_produk) .'`)" class="btn btn-xs btn-info btn-flat"><i class="fa fa-pencil"></i></button>
-                    <button type="button" onclick="deleteData(`'. route('produk.destroy', $produk->id_produk) .'`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
+                    <button type="button" onclick="editForm(`'. route('produk.update', $produk->id) .'`)" class="btn btn-xs btn-info btn-flat"><i class="fa fa-pencil"></i></button>
+                    <button type="button" onclick="deleteData(`'. route('produk.destroy', $produk->id) .'`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
                 </div>
                 ';
             })
@@ -82,11 +86,27 @@ class ProdukController extends Controller
     public function store(Request $request)
     {
         $produk = Produk::latest()->first() ?? new Produk();
-        $request['kode_produk'] = 'P'. tambah_nol_didepan((int)$produk->id_produk +1, 6);
+        $request['kode_produk'] = 'P'. tambah_nol_didepan((int)$produk->id +1, 6);
 
-        $produk = Produk::create($request->all());
+        $produk = Produk::create([
+            'kode_produk' => $request->kode_produk,
+            'nama_produk' => $request->nama_produk,
+            'id_kategori' => $request->id_kategori,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'harga_reseller' => $request->harga_reseller,
+            'stok' => $request->stok,
+            "diskon" => $request->diskon,
+            "merk" => $request->merk
+        ]);
 
-        return response()->json('Data berhasil disimpan', 200);
+        foreach ($request->material as $key => $materi) {
+            $produk->stok()->attach($materi, [
+                "jumlah" => $request->jumlah[$key]
+            ]);
+        }
+
+        return response()->json("data berhasil ditambahkan", 200);
     }
 
     /**
@@ -137,6 +157,7 @@ class ProdukController extends Controller
     public function destroy($id)
     {
         $produk = Produk::find($id);
+        $produk->stok()->detach();
         $produk->delete();
 
         return response(null, 204);
@@ -146,6 +167,7 @@ class ProdukController extends Controller
     {
         foreach ($request->id_produk as $id) {
             $produk = Produk::find($id);
+            $produk->stok()->detach();
             $produk->delete();
         }
 

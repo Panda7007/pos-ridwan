@@ -16,17 +16,17 @@ Manajemen Stok
             <div class="box-header with-border">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create">
-                        Launch Default Modal
+                        Tambah Material
                     </button>
                     <div class="modal fade" id="create" style="display: none;" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h4 class="modal-title">Default Modal</h4>
+                                    <h4 class="modal-title">Tambah Material</h4>
                                 </div>
                                 <div class="modal-body">
                                     <div class="form-group">
-                                        <label for="nama_barang">Nama Barang</label>
+                                        <label for="nama_barang">Nama Material</label>
                                         <input type="text" class="form-control" id="nama_barang" name="nama_barang">
                                     </div>
                                     <div class="form-group">
@@ -53,7 +53,7 @@ Manajemen Stok
                     <thead>
                         <th width="5%">No</th>
                         <th>Tanggal</th>
-                        <th>Nama Barang</th>
+                        <th>Nama Material</th>
                         <th>Deskripsi</th>
                         <th>Sisa</th>
                         <th>Action</th>
@@ -74,7 +74,7 @@ Manajemen Stok
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title">Default Modal</h4>
+                                                <h4 class="modal-title">Edit Material</h4>
                                             </div>
                                             <div class="modal-body">
                                                 <div class="form-group" style="display: block; width: 100%;">
@@ -189,7 +189,7 @@ Manajemen Stok
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h4 class="modal-title">Default Modal</h4>
+                                                    <h4 class="modal-title">Edit Material</h4>
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="form-group" style="display: block; width: 100%;">

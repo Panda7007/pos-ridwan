@@ -21,7 +21,7 @@
                     <div class="form-group row">
                         <label for="id_kategori" class="col-lg-2 col-lg-offset-1 control-label">Kategori</label>
                         <div class="col-lg-6">
-                            <select name="id_kategori" id="id_kategori" class="form-control" style="width: 100%" required>
+                            <select name="id_kategori" id="id_kategori" class="form-control" style="width: 100%; min-width: 100%;" required>
                                 <option value="" disabled selected>Pilih Kategori</option>
                                 @foreach ($kategori as $key => $item)
                                 <option value="{{ $key }}">{{ $item }}</option>
@@ -67,7 +67,7 @@
                             <span class="help-block with-errors"></span>
                         </div>
                     </div>
-                    <table class="table">
+                    <table class="table form">
                         <thead>
                             <tr>
                                 <th>Material</th>
@@ -76,22 +76,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <select onchange="getMax(this)" style="width: 100%" name="material[]" class="form-control">
-                                        <option value="" disabled selected>Pilih Material</option>
-                                        @foreach ($material as $item)
-                                        <option value="{{ $item->id}}">{{ $item->nama_barang }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="number" min="1" name="jumlah[]" class="form-control">
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-success" onclick="tambahRow(this)">Tambah Bahan</button>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>

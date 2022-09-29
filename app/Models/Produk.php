@@ -12,9 +12,9 @@ class Produk extends Model
 
     protected $table = 'produk';
     protected $guarded = ["id"];
-    protected $with = ["stok"];
+    protected $with = ["material"];
 
-    public function stok()
+    public function material()
     {
         return $this->belongsToMany(Stok::class)->withPivot("jumlah");
     }

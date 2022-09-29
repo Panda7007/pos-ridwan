@@ -7,6 +7,7 @@ use App\Models\Stok;
 use App\Models\Produk;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 class ProdukController extends Controller
@@ -100,13 +101,15 @@ class ProdukController extends Controller
             "merk" => $request->merk
         ]);
 
+        // return response()->json($request->all(), 500);
+
         foreach ($request->material as $key => $materi) {
-            $produk->stok()->attach($materi, [
-                "jumlah" => $request->jumlah[$key]
+            $produk->material()->attach($materi, [
+                'jumlah' => $request->jumlah[$key]
             ]);
         }
 
-        return response()->json("data berhasil ditambahkan", 200);
+        return response()->json($request->all, 200);
     }
 
     /**
@@ -143,7 +146,24 @@ class ProdukController extends Controller
     public function update(Request $request, $id)
     {
         $produk = Produk::find($id);
-        $produk->update($request->all());
+        $produk->update([
+            'nama_produk' => $request->nama_produk,
+            'id_kategori' => $request->id_kategori,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'harga_reseller' => $request->harga_reseller,
+            'stok' => $request->stok,
+            "diskon" => $request->diskon,
+            "merk" => $request->merk
+        ]);
+
+        $produk->material()->detach();
+
+        foreach ($request->material as $key => $materi) {
+            $produk->material()->attach($materi, [
+                'jumlah' => $request->jumlah[$key]
+            ]);
+        }
 
         return response()->json('Data berhasil disimpan', 200);
     }
@@ -157,7 +177,7 @@ class ProdukController extends Controller
     public function destroy($id)
     {
         $produk = Produk::find($id);
-        $produk->stok()->detach();
+        $produk->material()->detach();
         $produk->delete();
 
         return response(null, 204);
@@ -167,7 +187,7 @@ class ProdukController extends Controller
     {
         foreach ($request->id_produk as $id) {
             $produk = Produk::find($id);
-            $produk->stok()->detach();
+            $produk->material()->detach();
             $produk->delete();
         }
 

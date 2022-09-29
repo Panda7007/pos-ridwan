@@ -62,7 +62,7 @@ Manajemen Stok
                         @foreach($stoks as $nomor => $stok)
                         <tr>
                             <td>{{$nomor + 1}}</td>
-                            <td>{{$stok->created_at->format("d-m-Y")}}</td>
+                            <td>{{$stok->created_at->format("Y-m-d")}}</td>
                             <td>{{$stok->nama_barang}}</td>
                             <td>{{$stok->deskripsi}}</td>
                             <td>{{$stok->sisa}}</td>

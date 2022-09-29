@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Penjualan;
-use App\Models\PenjualanDetail;
+use PDF;
+use App\Models\Stok;
 use App\Models\Produk;
 use App\Models\Setting;
+use App\Models\Penjualan;
 use Illuminate\Http\Request;
-use PDF;
+use App\Models\PenjualanDetail;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class PenjualanController extends Controller
 {
@@ -95,8 +98,11 @@ class PenjualanController extends Controller
             $item->diskon = $request->diskon;
             $item->update();
 
-            $produk = Produk::find($item->id_produk);
+            $produk = Produk::find($item->produk_id);
             $produk->stok -= $item->jumlah;
+            foreach($produk->material as $material) {
+                Stok::find($material->id)->decrement('sisa', $material->pivot->jumlah * $item->jumlah);
+            }
             $produk->update();
         }
 
@@ -134,7 +140,7 @@ class PenjualanController extends Controller
         $penjualan = Penjualan::find($id);
         $detail    = PenjualanDetail::where('id_penjualan', $penjualan->id_penjualan)->get();
         foreach ($detail as $item) {
-            $produk = Produk::find($item->id_produk);
+            $produk = Produk::find($item->produk_id);
             if ($produk) {
                 $produk->stok += $item->jumlah;
                 $produk->update();

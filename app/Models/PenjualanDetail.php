@@ -12,9 +12,10 @@ class PenjualanDetail extends Model
     protected $table = 'penjualan_detail';
     protected $primaryKey = 'id_penjualan_detail';
     protected $guarded = [];
+    protected $with = ["produk"];
 
     public function produk()
     {
-        return $this->hasOne(Produk::class, 'id_produk', 'id_produk');
+        return $this->belongsTo(Produk::class, "produk_id", "id");
     }
 }

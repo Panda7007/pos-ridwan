@@ -15,6 +15,6 @@ class PembelianDetail extends Model
 
     public function produk()
     {
-        return $this->hasOne(Produk::class, 'id_produk', 'id_produk');
+        return $this->belongsTo(Produk::class, "produk_id", "id");
     }
 }

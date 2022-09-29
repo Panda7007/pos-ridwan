@@ -18,4 +18,14 @@ class Produk extends Model
     {
         return $this->belongsToMany(Stok::class)->withPivot("jumlah");
     }
+
+    public function penjualan_detail()
+    {
+        return $this->hasMany(PenjualanDetail::class, "produk_id", "id_penjualan_detail");
+    }
+
+    public function pembelian_detail()
+    {
+        return $this->hasMany(PembelianDetail::class, "produk_id", "id_pembelian_detail");
+    }
 }

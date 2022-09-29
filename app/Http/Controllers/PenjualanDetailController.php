@@ -34,8 +34,7 @@ class PenjualanDetailController extends Controller
 
     public function data($id)
     {
-        $detail = PenjualanDetail::with('produk')
-            ->where('id_penjualan', $id)
+        $detail = PenjualanDetail::where('id_penjualan', $id)
             ->get();
 
         $data = array();
@@ -78,14 +77,14 @@ class PenjualanDetailController extends Controller
 
     public function store(Request $request)
     {
-        $produk = Produk::where('id_produk', $request->id_produk)->first();
+        $produk = Produk::where('id', $request->id_produk)->first();
         if (! $produk) {
-            return response()->json('Data gagal disimpan', 400);
+            return response()->json($request->all(), 400);
         }
 
         $detail = new PenjualanDetail();
         $detail->id_penjualan = $request->id_penjualan;
-        $detail->id_produk = $produk->id_produk;
+        $detail->produk_id = $produk->id;
         $detail->harga_jual = $request->member == null ? $produk->harga_jual : $produk->harga_reseller;
         $detail->jumlah = 1;
         $detail->diskon = $produk->diskon;

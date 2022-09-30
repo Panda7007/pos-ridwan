@@ -94,17 +94,6 @@ class PenjualanController extends Controller
         $penjualan->update();
 
         $detail = PenjualanDetail::where('id_penjualan', $penjualan->id_penjualan)->get();
-        foreach ($detail as $item) {
-            $item->diskon = $request->diskon;
-            $item->update();
-
-            $produk = Produk::find($item->produk_id);
-            $produk->stok -= $item->jumlah;
-            foreach($produk->material as $material) {
-                Stok::find($material->id)->decrement('sisa', $material->pivot->jumlah * $item->jumlah);
-            }
-            $produk->update();
-        }
 
         return redirect()->route('transaksi.selesai');
     }
@@ -143,6 +132,9 @@ class PenjualanController extends Controller
             $produk = Produk::find($item->produk_id);
             if ($produk) {
                 $produk->stok += $item->jumlah;
+                foreach($produk->material as $material) {
+                    Stok::find($material->id)->increment('sisa', $material->pivot->jumlah * $item->jumlah);
+                }
                 $produk->update();
             }
 

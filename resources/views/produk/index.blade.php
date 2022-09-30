@@ -197,10 +197,6 @@
 
     let material = {!!$material!!};
 
-    function getMax(element) {
-        element.parentElement.nextElementSibling.children[0].setAttribute("max", material.find(materi => materi.id == element.value).sisa);
-    }
-
     function initialRow() {
         let select = document.createElement("select");
         let option = undefined;
@@ -213,7 +209,7 @@
         $(".table.form tbody").append(`
                             <tr>
                                 <td>
-                                    <select onchange="getMax(this)" name="material[]" class="form-control">
+                                    <select name="material[]" class="form-control">
                                         <option value="" disabled selected>Pilih Material</option>
                                         ${select.innerHTML}
                                     </select>
@@ -240,7 +236,7 @@
         $(element).parent().parent().parent().append(`
                             <tr>
                                 <td>
-                                    <select onchange="getMax(this)" name="material[]" class="form-control">
+                                    <select name="material[]" class="form-control">
                                         <option value="" disabled selected>Pilih Material</option>
                                         ${select.innerHTML}
                                     </select>

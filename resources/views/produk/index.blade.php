@@ -23,7 +23,7 @@
             <div class="box-body table-responsive">
                 <form action="" method="post" class="form-produk">
                     @csrf
-                    <table class="table table-striped table-bordered">
+                    <table class="data table table-striped table-bordered">
                         <thead>
                             <th width="5%">
                                 <input type="checkbox" name="select_all" id="select_all">
@@ -54,7 +54,7 @@
     let table;
 
     $(function () {
-        table = $('.table').DataTable({
+        table = $('.data.table').DataTable({
             responsive: true,
             processing: true,
             serverSide: true,
@@ -85,6 +85,7 @@
                         table.ajax.reload();
                     })
                     .fail((errors) => {
+                        console.log(errors)
                         alert('Tidak dapat menyimpan data');
                         return;
                     });
@@ -101,16 +102,20 @@
         $('#modal-form .modal-title').text('Tambah Produk');
 
         $('#modal-form form')[0].reset();
+        $(".table.form tbody").html("");
         $('#modal-form form').attr('action', url);
         $('#modal-form [name=_method]').val('post');
         $('#modal-form [name=nama_produk]').focus();
+        initialRow();
     }
 
     function editForm(url) {
+        let materiEdit = {!!$material!!};
         $('#modal-form').modal('show');
         $('#modal-form .modal-title').text('Edit Produk');
 
         $('#modal-form form')[0].reset();
+        $(".table.form tbody").html("");
         $('#modal-form form').attr('action', url);
         $('#modal-form [name=_method]').val('put');
         $('#modal-form [name=nama_produk]').focus();
@@ -122,10 +127,18 @@
                 $('#modal-form [name=merk]').val(response.merk);
                 $('#modal-form [name=harga_beli]').val(response.harga_beli);
                 $('#modal-form [name=harga_jual]').val(response.harga_jual);
+                $('#modal-form [name=harga_reseller]').val(response.harga_reseller);
                 $('#modal-form [name=diskon]').val(response.diskon);
                 $('#modal-form [name=stok]').val(response.stok);
+                response.material.forEach(materi => {
+                    initialRow();
+                    let row = $(".table.form tbody tr:last");
+                    row.find("[name='material[]']").val(materi.id);
+                    row.find("[name='jumlah[]']").val(materi.pivot.jumlah);
+                });
             })
             .fail((errors) => {
+                console.log(errors);
                 alert('Tidak dapat menampilkan data');
                 return;
             });
@@ -141,6 +154,7 @@
                     table.ajax.reload();
                 })
                 .fail((errors) => {
+                    console.log(errors)
                     alert('Tidak dapat menghapus data');
                     return;
                 });
@@ -155,6 +169,7 @@
                         table.ajax.reload();
                     })
                     .fail((errors) => {
+                        console.log(errors)
                         alert('Tidak dapat menghapus data');
                         return;
                     });
@@ -178,6 +193,62 @@
                 .attr('action', url)
                 .submit();
         }
+    }
+
+    let material = {!!$material!!};
+
+    function initialRow() {
+        let select = document.createElement("select");
+        let option = undefined;
+        material.forEach(materi => {
+            option = document.createElement("option");
+            option.value = materi.id;
+            option.text = materi.nama_barang;
+            select.appendChild(option);
+        });
+        $(".table.form tbody").append(`
+                            <tr>
+                                <td>
+                                    <select name="material[]" class="form-control">
+                                        <option value="" disabled selected>Pilih Material</option>
+                                        ${select.innerHTML}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" min="0" name="jumlah[]" class="form-control">
+                                </td>
+                                <td>
+                                    <button type="button" onclick="tambahRow(this)" class="btn btn-success">Tambah Bahan</button>
+                                </td>
+                            </tr>
+        `);
+    };
+
+    function tambahRow(element) {
+        let select = document.createElement("select");
+        let option = undefined;
+        material.forEach(materi => {
+            option = document.createElement("option");
+            option.value = materi.id;
+            option.text = materi.nama_barang;
+            select.appendChild(option);
+        });
+        $(element).parent().parent().parent().append(`
+                            <tr>
+                                <td>
+                                    <select name="material[]" class="form-control">
+                                        <option value="" disabled selected>Pilih Material</option>
+                                        ${select.innerHTML}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" min="0" name="jumlah[]" class="form-control">
+                                </td>
+                                <td>
+                                    <button type="button" onclick="tambahRow(this)" class="btn btn-success">Tambah Bahan</button>
+                                </td>
+                            </tr>
+        `);
     }
 </script>
 @endpush

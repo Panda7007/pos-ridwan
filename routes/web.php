@@ -17,6 +17,7 @@ use App\Http\Controllers\{
     StokController
 };
 use Illuminate\Support\Facades\Route;
+use App\Models\PenjualanDetail;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,9 +100,19 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/setting/first', [SettingController::class, 'show'])->name('setting.show');
         Route::post('/setting', [SettingController::class, 'update'])->name('setting.update');
     });
- 
+
     Route::group(['middleware' => 'level:1,2'], function () {
         Route::get('/profil', [UserController::class, 'profil'])->name('user.profil');
         Route::post('/profil', [UserController::class, 'updateProfil'])->name('user.update_profil');
     });
+});
+
+Route::get("/tes", function () {
+    $item = PenjualanDetail::get()->first();
+    $kecil = $item->produk->material->map(function ($material) {
+        return floor($material->sisa / $material->pivot->jumlah);
+    })->sort()->first();
+    $max = ($item->produk->stok <= $kecil) ? $item->produk->stok : $kecil;
+    $value = ($item->jumlah <= $max) ? $item->jumlah : $max;
+    dd($value);
 });

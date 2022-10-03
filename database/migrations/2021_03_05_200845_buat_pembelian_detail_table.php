@@ -16,7 +16,7 @@ class BuatPembelianDetailTable extends Migration
         Schema::create('pembelian_detail', function (Blueprint $table) {
             $table->increments('id_pembelian_detail');
             $table->integer('id_pembelian');
-            $table->integer('id_produk');
+            $table->foreignId("produk_id")->constrained("produk");
             $table->integer('harga_beli');
             $table->integer('jumlah');
             $table->integer('subtotal');

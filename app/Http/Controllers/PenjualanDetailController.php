@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Stok;
 use App\Models\Member;
-use App\Models\Penjualan;
-use App\Models\PenjualanDetail;
 use App\Models\Produk;
 use App\Models\Setting;
+use App\Models\Penjualan;
 use Illuminate\Http\Request;
+use App\Models\PenjualanDetail;
+use Illuminate\Routing\Controller;
 
 class PenjualanDetailController extends Controller
 {
@@ -34,8 +36,7 @@ class PenjualanDetailController extends Controller
 
     public function data($id)
     {
-        $detail = PenjualanDetail::with('produk')
-            ->where('id_penjualan', $id)
+        $detail = PenjualanDetail::where('id_penjualan', $id)
             ->get();
 
         $data = array();
@@ -43,11 +44,15 @@ class PenjualanDetailController extends Controller
         $total_item = 0;
 
         foreach ($detail as $item) {
+            $kecil = $item->produk->material->map(function ($material) {
+                return floor($material->sisa / $material->pivot->jumlah);
+            })->sort()->first();
+            $max = ($item->produk->stok <= $kecil) ? $item->produk->stok : $kecil;
             $row = array();
             $row['kode_produk'] = '<span class="label label-success">'. $item->produk['kode_produk'] .'</span';
             $row['nama_produk'] = $item->produk['nama_produk'];
             $row['harga_jual']  = 'Rp. '. format_uang($item->harga_jual);
-            $row['jumlah']      = '<input type="number" class="form-control input-sm quantity" data-id="'. $item->id_penjualan_detail .'" value="'. $item->jumlah .'" max="'.$item->produk->stok.'">';
+            $row['jumlah']      = '<input type="number" class="form-control input-sm quantity" min = "0" data-id="'. $item->id_penjualan_detail .'" value="'. $item->jumlah .'" max="'.$max.'">';
             $row['subtotal']    = 'Rp. '. format_uang($item->subtotal);
             $row['aksi']        = '<div class="btn-group">
                                     <button onclick="deleteData(`'. route('transaksi.destroy', $item->id_penjualan_detail) .'`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
@@ -78,16 +83,16 @@ class PenjualanDetailController extends Controller
 
     public function store(Request $request)
     {
-        $produk = Produk::where('id_produk', $request->id_produk)->first();
+        $produk = Produk::where('id', $request->id_produk)->first();
         if (! $produk) {
-            return response()->json('Data gagal disimpan', 400);
+            return response()->json($request->all(), 400);
         }
 
         $detail = new PenjualanDetail();
         $detail->id_penjualan = $request->id_penjualan;
-        $detail->id_produk = $produk->id_produk;
+        $detail->produk_id = $produk->id;
         $detail->harga_jual = $request->member == null ? $produk->harga_jual : $produk->harga_reseller;
-        $detail->jumlah = 1;
+        $detail->jumlah = 0;
         $detail->diskon = $produk->diskon;
         $detail->subtotal = $produk->harga_jual - ($produk->diskon / 100 * $produk->harga_jual);;
         $detail->save();
@@ -98,6 +103,19 @@ class PenjualanDetailController extends Controller
     public function update(Request $request, $id)
     {
         $detail = PenjualanDetail::find($id);
+        $produk = Produk::find($detail->produk_id);
+        if ($request->jumlah > $detail->jumlah) {
+            $produk->stok -= $request->jumlah;
+            foreach($produk->material as $material) {
+                Stok::find($material->id)->decrement('sisa', $material->pivot->jumlah * $request->jumlah);
+            }
+        } else {
+            $produk->stok += $request->jumlah;
+            foreach($produk->material as $material) {
+                Stok::find($material->id)->increment('sisa', $material->pivot->jumlah * $request->jumlah);
+            }
+        }
+        $produk->update();
         $detail->jumlah = $request->jumlah;
         $detail->subtotal = $detail->harga_jual * $request->jumlah - (($detail->diskon * $request->jumlah) / 100 * $detail->harga_jual);;
         $detail->update();

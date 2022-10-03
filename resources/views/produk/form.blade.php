@@ -21,8 +21,8 @@
                     <div class="form-group row">
                         <label for="id_kategori" class="col-lg-2 col-lg-offset-1 control-label">Kategori</label>
                         <div class="col-lg-6">
-                            <select name="id_kategori" id="id_kategori" class="form-control" required>
-                                <option value="">Pilih Kategori</option>
+                            <select name="id_kategori" id="id_kategori" class="form-control" style="width: 100%; min-width: 100%;" required>
+                                <option value="" disabled selected>Pilih Kategori</option>
                                 @foreach ($kategori as $key => $item)
                                 <option value="{{ $key }}">{{ $item }}</option>
                                 @endforeach
@@ -67,9 +67,20 @@
                             <span class="help-block with-errors"></span>
                         </div>
                     </div>
+                    <table class="table form">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>jumlah</th>
+                                <th>action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-sm btn-flat btn-primary"><i class="fa fa-save"></i> Simpan</button>
+                    <button type="submit" class="btn btn-sm btn-flat btn-primary"><i class="fa fa-save"></i> Simpan</button>
                     <button type="button" class="btn btn-sm btn-flat btn-warning" data-dismiss="modal"><i class="fa fa-arrow-circle-left"></i> Batal</button>
                 </div>
             </div>

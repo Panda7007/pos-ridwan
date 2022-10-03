@@ -68,14 +68,14 @@ class PembelianDetailController extends Controller
 
     public function store(Request $request)
     {
-        $produk = Produk::where('id_produk', $request->id_produk)->first();
+        $produk = Produk::where('id', $request->id_produk)->first();
         if (! $produk) {
             return response()->json('Data gagal disimpan', 400);
         }
 
         $detail = new PembelianDetail();
         $detail->id_pembelian = $request->id_pembelian;
-        $detail->id_produk = $produk->id_produk;
+        $detail->produk_id = $produk->id;
         $detail->harga_beli = $produk->harga_beli;
         $detail->jumlah = 1;
         $detail->subtotal = $produk->harga_beli;

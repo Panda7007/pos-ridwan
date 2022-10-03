@@ -16,21 +16,17 @@ Manajemen Stok
             <div class="box-header with-border">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create">
-<<<<<<< HEAD
-                        Input Material
-=======
+
                         Tambah Material
->>>>>>> b62a2f938fd52c2d17dbc4019709ee28098423aa
+
                     </button>
                     <div class="modal fade" id="create" style="display: none;" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-<<<<<<< HEAD
-                                    <h4 class="modal-title">Input Material</h4>
-=======
+
                                     <h4 class="modal-title">Tambah Material</h4>
->>>>>>> b62a2f938fd52c2d17dbc4019709ee28098423aa
+
                                 </div>
                                 <div class="modal-body">
                                     <div class="form-group">

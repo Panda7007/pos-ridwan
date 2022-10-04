@@ -1,12 +1,12 @@
 @extends('layouts.master')
 
 @section('title')
-    Daftar Member
+    Daftar Reseller
 @endsection
 
 @section('breadcrumb')
     @parent
-    <li class="active">Daftar Member</li>
+    <li class="active">Daftar Reseller</li>
 @endsection
 
 @section('content')
@@ -15,7 +15,7 @@
         <div class="box">
             <div class="box-header with-border">
                 <button onclick="addForm('{{ route('member.store') }}')" class="btn btn-success btn-xs btn-flat"><i class="fa fa-plus-circle"></i> Tambah</button>
-                <button onclick="cetakMember('{{ route('member.cetak_member') }}')" class="btn btn-info btn-xs btn-flat"><i class="fa fa-id-card"></i> Cetak Member</button>
+                <button onclick="cetakMember('{{ route('member.cetak_member') }}')" class="btn btn-info btn-xs btn-flat"><i class="fa fa-id-card"></i> Cetak Reseller</button>
             </div>
             <div class="box-body table-responsive">
                 <form action="" method="post" class="form-member">
@@ -97,7 +97,7 @@
 
     function editForm(url) {
         $('#modal-form').modal('show');
-        $('#modal-form .modal-title').text('Edit Member');
+        $('#modal-form .modal-title').text('Edit Reseller');
 
         $('#modal-form form')[0].reset();
         $('#modal-form form').attr('action', url);

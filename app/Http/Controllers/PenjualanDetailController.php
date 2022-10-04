@@ -52,7 +52,7 @@ class PenjualanDetailController extends Controller
             $row['kode_produk'] = '<span class="label label-success">'. $item->produk['kode_produk'] .'</span';
             $row['nama_produk'] = $item->produk['nama_produk'];
             $row['harga_jual']  = 'Rp. '. format_uang($item->harga_jual);
-            $row['jumlah']      = '<input type="number" class="form-control input-sm quantity" min = "0" data-id="'. $item->id_penjualan_detail .'" value="'. $item->jumlah .'" max="'.$max.'">';
+            $row['jumlah']      = '<input type="number" class="form-control input-sm quantity" min = "0" onkeydown="return false" data-id="'. $item->id_penjualan_detail .'" value="'. $item->jumlah .'" max="'.$max.'">';
             $row['subtotal']    = 'Rp. '. format_uang($item->subtotal);
             $row['aksi']        = '<div class="btn-group">
                                     <button onclick="deleteData(`'. route('transaksi.destroy', $item->id_penjualan_detail) .'`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
@@ -105,20 +105,21 @@ class PenjualanDetailController extends Controller
         $detail = PenjualanDetail::find($id);
         $produk = Produk::find($detail->produk_id);
         if ($request->jumlah > $detail->jumlah) {
-            $produk->stok -= $request->jumlah;
+            $produk->stok--;
             foreach($produk->material as $material) {
-                Stok::find($material->id)->decrement('sisa', $material->pivot->jumlah * $request->jumlah);
+                Stok::find($material->id)->decrement("sisa", $material->pivot->jumlah);
             }
-        } else {
-            $produk->stok += $request->jumlah;
+        } else if ($request->jumlah < $detail->jumlah) {
+            $produk->stok++;
             foreach($produk->material as $material) {
-                Stok::find($material->id)->increment('sisa', $material->pivot->jumlah * $request->jumlah);
+                Stok::find($material->id)->increment('sisa', $material->pivot->jumlah);
             }
         }
         $produk->update();
         $detail->jumlah = $request->jumlah;
         $detail->subtotal = $detail->harga_jual * $request->jumlah - (($detail->diskon * $request->jumlah) / 100 * $detail->harga_jual);;
         $detail->update();
+        return response()->json($detail, 200);
     }
 
     public function destroy($id)

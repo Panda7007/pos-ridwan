@@ -93,8 +93,6 @@ class PenjualanController extends Controller
         $penjualan->kekurangan = $request->kekurangan;
         $penjualan->update();
 
-        $detail = PenjualanDetail::where('id_penjualan', $penjualan->id_penjualan)->get();
-
         return redirect()->route('transaksi.selesai');
     }
 

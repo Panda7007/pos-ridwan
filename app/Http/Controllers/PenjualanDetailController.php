@@ -49,13 +49,13 @@ class PenjualanDetailController extends Controller
             })->sort()->first();
             $max = ($item->produk->stok <= $kecil) ? $item->produk->stok : $kecil;
             $row = array();
-            $row['kode_produk'] = '<span class="label label-success">'. $item->produk['kode_produk'] .'</span';
+            $row['kode_produk'] = '<span class="label label-success">' . $item->produk['kode_produk'] . '</span';
             $row['nama_produk'] = $item->produk['nama_produk'];
-            $row['harga_jual']  = 'Rp. '. format_uang($item->harga_jual);
-            $row['jumlah']      = '<input type="number" class="form-control input-sm quantity" min = "0" onkeydown="return false" data-id="'. $item->id_penjualan_detail .'" value="'. $item->jumlah .'" max="'.$max.'">';
-            $row['subtotal']    = 'Rp. '. format_uang($item->subtotal);
+            $row['harga_jual']  = 'Rp. ' . format_uang($item->harga_jual);
+            $row['jumlah']      = '<button onclick="this.nextSibling.stepDown()" class="kurangValue">-</button><input type="number" class="quantity" min = "0" readonly data-id="' . $item->id_penjualan_detail . '" value="' . $item->jumlah . '" max="' . $max . '"><button onclick="this.previousSibling.stepUp()" class="tambahValue">+</button>';
+            $row['subtotal']    = 'Rp. ' . format_uang($item->subtotal);
             $row['aksi']        = '<div class="btn-group">
-                                    <button onclick="deleteData(`'. route('transaksi.destroy', $item->id_penjualan_detail) .'`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
+                                    <button onclick="deleteData(`' . route('transaksi.destroy', $item->id_penjualan_detail) . '`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
                                 </div>';
             $data[] = $row;
 
@@ -64,8 +64,8 @@ class PenjualanDetailController extends Controller
         }
         $data[] = [
             'kode_produk' => '
-                <div class="total hide">'. $total .'</div>
-                <div class="total_item hide">'. $total_item .'</div>',
+                <div class="total hide">' . $total . '</div>
+                <div class="total_item hide">' . $total_item . '</div>',
             'nama_produk' => '',
             'harga_jual'  => '',
             'jumlah'      => '',
@@ -84,7 +84,7 @@ class PenjualanDetailController extends Controller
     public function store(Request $request)
     {
         $produk = Produk::where('id', $request->id_produk)->first();
-        if (! $produk) {
+        if (!$produk) {
             return response()->json($request->all(), 400);
         }
 
@@ -106,12 +106,12 @@ class PenjualanDetailController extends Controller
         $produk = Produk::find($detail->produk_id);
         if ($request->jumlah > $detail->jumlah) {
             $produk->stok--;
-            foreach($produk->material as $material) {
+            foreach ($produk->material as $material) {
                 Stok::find($material->id)->decrement("sisa", $material->pivot->jumlah);
             }
         } else if ($request->jumlah < $detail->jumlah) {
             $produk->stok++;
-            foreach($produk->material as $material) {
+            foreach ($produk->material as $material) {
                 Stok::find($material->id)->increment('sisa', $material->pivot->jumlah);
             }
         }
@@ -140,9 +140,9 @@ class PenjualanDetailController extends Controller
             "kekurangan" => $total > $diterima ? $total - $diterima : 0,
             "kekuranganrp" => $total > $diterima ? format_uang($total - $diterima) : 0,
             'bayarrp' => format_uang($bayar),
-            'terbilang' => ucwords(terbilang($bayar). ' Rupiah'),
+            'terbilang' => ucwords(terbilang($bayar) . ' Rupiah'),
             'kembalirp' => format_uang($kembali),
-            'kembali_terbilang' => ucwords(terbilang($kembali). ' Rupiah'),
+            'kembali_terbilang' => ucwords(terbilang($kembali) . ' Rupiah'),
         ];
 
         return response()->json($data);

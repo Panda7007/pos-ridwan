@@ -23,7 +23,7 @@ class PenjualanController extends Controller
 
     public function data()
     {
-        Penjualan::where("simpan", 0)->delete();
+        Penjualan::where("total_item", 0)->where("simpan", 0)->delete();
         $penjualan = Penjualan::with('member')->orderBy('id_penjualan', 'desc')->get();
 
         return datatables()
@@ -33,13 +33,13 @@ class PenjualanController extends Controller
                 return format_uang($penjualan->total_item);
             })
             ->addColumn('total_harga', function ($penjualan) {
-                return 'Rp. '. format_uang($penjualan->total_harga);
+                return 'Rp. ' . format_uang($penjualan->total_harga);
             })
             ->addColumn('bayar', function ($penjualan) {
-                return 'Rp. '. format_uang($penjualan->bayar);
+                return 'Rp. ' . format_uang($penjualan->bayar);
             })
             ->addColumn('kekurangan', function ($penjualan) {
-                return 'Rp. '. format_uang($penjualan->kekurangan);
+                return 'Rp. ' . format_uang($penjualan->kekurangan);
             })
             ->addColumn('tanggal', function ($penjualan) {
                 return tanggal_indonesia($penjualan->created_at, false);
@@ -55,8 +55,8 @@ class PenjualanController extends Controller
                 return '
                 <div class="btn-group">
                     <button onclick=editPenjualan(' . $penjualan->id_penjualan . ') class="btn btn-xs btn-warning btn-flat">Edit</button>
-                    <button onclick="showDetail(`'. route('penjualan.show', $penjualan->id_penjualan) .'`)" class="btn btn-xs btn-info btn-flat"><i class="fa fa-eye"></i></button>
-                    <button onclick="deleteData(`'. route('penjualan.destroy', $penjualan->id_penjualan) .'`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
+                    <button onclick="showDetail(`' . route('penjualan.show', $penjualan->id_penjualan) . '`)" class="btn btn-xs btn-info btn-flat"><i class="fa fa-eye"></i></button>
+                    <button onclick="deleteData(`' . route('penjualan.destroy', $penjualan->id_penjualan) . '`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
                 </div>
                 ';
             })
@@ -104,19 +104,19 @@ class PenjualanController extends Controller
             ->of($detail)
             ->addIndexColumn()
             ->addColumn('kode_produk', function ($detail) {
-                return '<span class="label label-success">'. $detail->produk->kode_produk .'</span>';
+                return '<span class="label label-success">' . $detail->produk->kode_produk . '</span>';
             })
             ->addColumn('nama_produk', function ($detail) {
                 return $detail->produk->nama_produk;
             })
             ->addColumn('harga_jual', function ($detail) {
-                return 'Rp. '. format_uang($detail->harga_jual);
+                return 'Rp. ' . format_uang($detail->harga_jual);
             })
             ->addColumn('jumlah', function ($detail) {
                 return format_uang($detail->jumlah);
             })
             ->addColumn('subtotal', function ($detail) {
-                return 'Rp. '. format_uang($detail->subtotal);
+                return 'Rp. ' . format_uang($detail->subtotal);
             })
             ->rawColumns(['kode_produk'])
             ->make(true);
@@ -130,7 +130,7 @@ class PenjualanController extends Controller
             $produk = Produk::find($item->produk_id);
             if ($produk) {
                 $produk->stok += $item->jumlah;
-                foreach($produk->material as $material) {
+                foreach ($produk->material as $material) {
                     Stok::find($material->id)->increment('sisa', $material->pivot->jumlah * $item->jumlah);
                 }
                 $produk->update();
@@ -144,7 +144,8 @@ class PenjualanController extends Controller
         return response(null, 204);
     }
 
-    public function update (Request $request) {
+    public function update(Request $request)
+    {
         Penjualan::where("id_penjualan", $request->id_penjualan)->first()->update([
             "kekurangan" => $request->kekurangan,
         ]);
@@ -163,13 +164,13 @@ class PenjualanController extends Controller
     {
         $setting = Setting::first();
         $penjualan = Penjualan::find(session('id_penjualan'));
-        if (! $penjualan) {
+        if (!$penjualan) {
             abort(404);
         }
         $detail = PenjualanDetail::with('produk')
             ->where('id_penjualan', session('id_penjualan'))
             ->get();
-        
+
         return view('penjualan.nota_kecil', compact('setting', 'penjualan', 'detail'));
     }
 
@@ -177,7 +178,7 @@ class PenjualanController extends Controller
     {
         $setting = Setting::first();
         $penjualan = Penjualan::find(session('id_penjualan'));
-        if (! $penjualan) {
+        if (!$penjualan) {
             abort(404);
         }
         $detail = PenjualanDetail::with('produk')
@@ -185,7 +186,7 @@ class PenjualanController extends Controller
             ->get();
 
         $pdf = PDF::loadView('penjualan.nota_besar', compact('setting', 'penjualan', 'detail'));
-        $pdf->setPaper(0,0,609,440, 'potrait');
-        return $pdf->stream('Transaksi-'. date('Y-m-d-his') .'.pdf');
+        $pdf->setPaper(0, 0, 609, 440, 'potrait');
+        return $pdf->stream('Transaksi-' . date('Y-m-d-his') . '.pdf');
     }
 }

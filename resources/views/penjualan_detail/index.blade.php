@@ -100,7 +100,6 @@
                                 <input type="hidden" name="bayar" id="bayar">
                                 <input type="hidden" name="id_member" id="id_member"
                                     value="{{ $memberSelected->id_member }}">
-
                                 <div class="form-group row">
                                     <label for="totalrp" class="col-lg-2 control-label">Total</label>
                                     <div class="col-lg-8">
@@ -209,35 +208,18 @@
                 });
             table2 = $('.table-produk').DataTable();
 
-            $(document).on('click', '.tambahValue', function() {
-                let id = $(this.previousSibling).data('id');
-                let jumlah = parseInt($(this.previousSibling).val());
+            $(document).on('input', '.quantity', function() {
+                let id = $(this).data('id');
+                let jumlah = parseInt($(this).val());
 
                 $.post(`{{ url('/transaksi') }}/${id}`, {
                         '_token': $('[name=csrf-token]').attr('content'),
                         '_method': 'put',
-                        'jumlah': jumlah
+                        'jumlah': jumlah,
+                        'total_item': $('#total_item').val(),
                     })
                     .done(response => {
-                        table.ajax.reload(() => loadForm($('#diskon').val()));
-                    })
-                    .fail(errors => {
-                        console.log(errors)
-                        alert('Tidak dapat menyimpan data');
-                        return;
-                    });
-            });
-
-            $(document).on('click', '.kurangValue', function() {
-                let id = $(this.nextSibling).data('id');
-                let jumlah = parseInt($(this.nextSibling).val());
-
-                $.post(`{{ url('/transaksi') }}/${id}`, {
-                        '_token': $('[name=csrf-token]').attr('content'),
-                        '_method': 'put',
-                        'jumlah': jumlah
-                    })
-                    .done(response => {
+                        console.log(response)
                         table.ajax.reload(() => loadForm($('#diskon').val()));
                     })
                     .fail(errors => {
@@ -331,52 +313,13 @@
             }
         }
 
-        // function kurangValue(elemen) {
-        //     elemen.nextSibling.value = parseInt(elemen.nextSibling.value) - 1;
-        //     let id = $(elemen.nextSibling).data('id');
-        //     let jumlah = parseInt($(elemen.nextSibling).val());
-
-        //     $.post(`{{ url('/transaksi') }}/${id}`, {
-        //             '_token': $('[name=csrf-token]').attr('content'),
-        //             '_method': 'put',
-        //             'jumlah': jumlah
-        //         })
-        //         .done(response => {
-        //             table.ajax.reload(() => loadForm($('#diskon').val()));
-        //         })
-        //         .fail(errors => {
-        //             console.log(errors)
-        //             alert('Tidak dapat menyimpan data');
-        //             return;
-        //         });
-        // }
-
-        // function tambahValue(elemen) {
-        //     elemen.previousSibling.value = parseInt(elemen.previousSibling.value) + 1;
-        //     let id = $(elemen.previousSibling).data('id');
-        //     let jumlah = parseInt($(elemen.previousSibling).val());
-
-        //     $.post(`{{ url('/transaksi') }}/${id}`, {
-        //             '_token': $('[name=csrf-token]').attr('content'),
-        //             '_method': 'put',
-        //             'jumlah': jumlah
-        //         })
-        //         .done(response => {
-        //             table.ajax.reload(() => loadForm($('#diskon').val()));
-        //         })
-        //         .fail(errors => {
-        //             console.log(errors)
-        //             alert('Tidak dapat menyimpan data');
-        //             return;
-        //         });
-        // }
-
         function loadForm(diskon = 0, diterima = 0) {
             $('#total').val($('.total').text());
             $('#total_item').val($('.total_item').text());
 
             $.get(`{{ url('/transaksi/loadform') }}/${diskon}/${$('.total').text()}/${diterima}`)
                 .done(response => {
+                    console.log(response)
                     $('#totalrp').val('Rp. ' + response.totalrp);
                     $('#bayarrp').val('Rp. ' + response.bayarrp);
                     $('#bayar').val(response.bayar);

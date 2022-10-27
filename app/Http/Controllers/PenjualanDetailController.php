@@ -44,15 +44,15 @@ class PenjualanDetailController extends Controller
         $total_item = 0;
 
         foreach ($detail as $item) {
-            // $kecil = $item->produk->material->map(function ($material) {
-            //     return floor($material->sisa / $material->pivot->jumlah);
-            // })->sort()->first();
-            // $max = ($item->produk->stok <= $kecil) ? $item->produk->stok : $kecil;
+            $kecil = $item->produk->material->map(function ($material) {
+                return floor($material->sisa / $material->pivot->jumlah);
+            })->sort()->first();
+            $max = ($item->produk->stok <= $kecil) ? $item->produk->stok : $kecil;
             $row = array();
             $row['kode_produk'] = '<span class="label label-success">' . $item->produk['kode_produk'] . '</span';
             $row['nama_produk'] = $item->produk['nama_produk'];
             $row['harga_jual']  = 'Rp. ' . format_uang($item->harga_jual);
-            $row['jumlah']      = '<input type="number" class="quantity" min = "0" data-id="' . $item->id_penjualan_detail . '" value="' . $item->jumlah . '>';
+            $row['jumlah']      = '<input type="number" class="quantity" min = "0" data-id="' . $item->id_penjualan_detail . '" value="' . $item->jumlah . '" max="' . $max + $item->jumlah . '">';
             $row['subtotal']    = 'Rp. ' . format_uang($item->subtotal);
             $row['aksi']        = '<div class="btn-group">
                                     <button onclick="deleteData(`' . route('transaksi.destroy', $item->id_penjualan_detail) . '`)" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
@@ -110,12 +110,16 @@ class PenjualanDetailController extends Controller
         if ($request->jumlah > $detail->jumlah) {
             $produk->stok -= $request->jumlah - $detail->jumlah;
             foreach ($produk->material as $material) {
-                Stok::find($material->id)->decrement("sisa", $material->pivot->jumlah);
+                Stok::find($material->id)->update([
+                    "sisa" => $material->sisa - (($request->jumlah - $detail->jumlah) * $material->pivot->jumlah)
+                ]);
             }
         } else if ($request->jumlah < $detail->jumlah) {
             $produk->stok += $detail->jumlah - $request->jumlah;
             foreach ($produk->material as $material) {
-                Stok::find($material->id)->increment('sisa', $material->pivot->jumlah);
+                Stok::find($material->id)->update([
+                    "sisa" => $material->sisa + (($detail->jumlah - $request->jumlah) * $material->pivot->jumlah)
+                ]);
             }
         }
         $produk->update();
@@ -128,6 +132,14 @@ class PenjualanDetailController extends Controller
     public function destroy($id)
     {
         $detail = PenjualanDetail::find($id);
+        $produk = Produk::find($detail->produk_id);
+        $produk->stok += $detail->jumlah;
+        foreach ($produk->material as $material) {
+            Stok::find($material->id)->update([
+                "sisa" => $material->sisa + (($detail->jumlah) * $material->pivot->jumlah)
+            ]);
+        }
+        $produk->update();
         $detail->delete();
 
         return response(null, 204);

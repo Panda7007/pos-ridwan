@@ -208,8 +208,12 @@
                 });
             table2 = $('.table-produk').DataTable();
 
-            $(document).on('input', '.quantity', function() {
+            $(document).on('input', '.quantity', function(e) {
                 let id = $(this).data('id');
+                if ($(this).val() > $(this).attr('max') && e.keyCode !== 46 && e.keyCode !== 8) {
+                    e.preventDefault();
+                    $(this).val($(this).attr("max"));
+                }
                 let jumlah = parseInt($(this).val());
 
                 $.post(`{{ url('/transaksi') }}/${id}`, {

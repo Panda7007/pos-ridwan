@@ -62,9 +62,6 @@ class PenjualanDetailController extends Controller
             $total += $item->harga_jual * $item->jumlah - (($item->diskon * $item->jumlah) / 100 * $item->harga_jual);;
             $total_item += $item->jumlah;
         }
-        Penjualan::where("id_penjualan", $id)->update(
-            ["total_item" => $total_item]
-        );
         $data[] = [
             'kode_produk' => '
                 <div class="total hide">' . $total . '</div>

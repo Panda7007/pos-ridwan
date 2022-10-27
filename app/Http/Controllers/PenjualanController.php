@@ -23,7 +23,24 @@ class PenjualanController extends Controller
 
     public function data()
     {
-        Penjualan::where("total_item", 0)->where("simpan", 0)->delete();
+        $penjualans = Penjualan::where("simpan", 0)->get();
+        foreach ($penjualans as $penjualan) {
+            $detail    = PenjualanDetail::where('id_penjualan', $penjualan->id_penjualan)->get();
+            foreach ($detail as $item) {
+                $produk = Produk::find($item->produk_id);
+                if ($produk) {
+                    $produk->stok += $item->jumlah;
+                    foreach ($produk->material as $material) {
+                        Stok::find($material->id)->increment('sisa', $material->pivot->jumlah * $item->jumlah);
+                    }
+                    $produk->update();
+                }
+
+                $item->delete();
+            }
+
+            $penjualan->delete();
+        }
         $penjualan = Penjualan::with('member')->orderBy('id_penjualan', 'desc')->get();
 
         return datatables()

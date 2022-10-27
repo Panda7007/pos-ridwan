@@ -48,7 +48,7 @@
             <div class="inner">
                 <h3>{{ $member }}</h3>
 
-                <p>Total Reseller</p>
+                <p>Total Member</p>
             </div>
             <div class="icon">
                 <i class="fa fa-id-card"></i>

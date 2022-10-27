@@ -18,7 +18,7 @@ class UserTableSeeder extends Seeder
             [
                 'name' => 'Administrator',
                 'email' => 'admin@gmail.com',
-                'password' => bcrypt('FullSenyum'),
+                'password' => bcrypt('123'),
                 'foto' => '/img/user.jpg',
                 'level' => 1
             ],

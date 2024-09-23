@@ -27,6 +27,22 @@ class PenjualanDetailController extends Controller
             return view('penjualan_detail.index', compact('produk', 'member', 'diskon', 'id_penjualan', 'penjualan', 'memberSelected'));
         } else {
             if (auth()->user()->level == 1) {
+                $penjualans = Penjualan::where("simpan", 0)->get();
+                foreach ($penjualans as $penjualan) {
+                    $detail    = PenjualanDetail::where('id_penjualan', $penjualan->id_penjualan)->get();
+                    foreach ($detail as $item) {
+                        $produk = Produk::find($item->produk_id);
+                        if ($produk) {
+                            $produk->stok += $item->jumlah;
+                            foreach ($produk->material as $material) {
+                                Stok::find($material->id)->increment('sisa', $material->pivot->jumlah * $item->jumlah);
+                            }
+                            $produk->update();
+                        }
+                        $item->delete();
+                    }
+                    $penjualan->delete();
+                }
                 return redirect()->route('transaksi.baru');
             } else {
                 return redirect()->route('home');
@@ -62,9 +78,6 @@ class PenjualanDetailController extends Controller
             $total += $item->harga_jual * $item->jumlah - (($item->diskon * $item->jumlah) / 100 * $item->harga_jual);;
             $total_item += $item->jumlah;
         }
-        Penjualan::where("id_penjualan", $id)->update(
-            ["total_item" => $total_item]
-        );
         $data[] = [
             'kode_produk' => '
                 <div class="total hide">' . $total . '</div>

@@ -23,7 +23,6 @@ class PenjualanController extends Controller
 
     public function data()
     {
-        Penjualan::where("total_item", 0)->where("simpan", 0)->delete();
         $penjualan = Penjualan::with('member')->orderBy('id_penjualan', 'desc')->get();
 
         return datatables()
